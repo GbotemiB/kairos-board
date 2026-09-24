@@ -5,3 +5,4 @@ package-lock.json
 next-env.d.ts
 supabase/.temp
 AGENTS.md
+src/lib/supabase/database.types.ts
