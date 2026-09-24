@@ -2,26 +2,19 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import Home from "@/app/page";
+import { siteConfig } from "@/lib/site";
 
-// Smoke test proving Vitest, jsdom, RTL, jest-dom matchers and the "@/" alias work.
-// Replace with real assertions when the board lands in Phase 2.
+// Placeholder page test. Replaced when the board lands (Phase 2, step 4).
 describe("Home page", () => {
-  it("renders the main heading", () => {
+  it("renders the tagline as the main heading", () => {
     render(<Home />);
 
-    expect(screen.getByRole("heading", { level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: siteConfig.tagline })).toBeInTheDocument();
   });
 
-  it("opens external links in a new tab safely", () => {
+  it("renders the site description", () => {
     render(<Home />);
 
-    const external = screen
-      .getAllByRole("link")
-      .filter((link) => link.getAttribute("target") === "_blank");
-
-    expect(external.length).toBeGreaterThan(0);
-    for (const link of external) {
-      expect(link).toHaveAttribute("rel", expect.stringContaining("noopener"));
-    }
+    expect(screen.getByText(siteConfig.description)).toBeInTheDocument();
   });
 });
