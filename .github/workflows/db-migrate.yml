@@ -35,11 +35,12 @@ jobs:
               exit 1
             fi
           done
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      # No dependency cache in a job holding production secrets (cache-poisoning risk).
+      - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
-          cache: npm
+          package-manager-cache: false
       - run: npm ci
       - run: npx supabase link --project-ref "$SUPABASE_PROJECT_REF"
       # Migrations only. seed.sql (demo user, sample data) is never pushed to production.

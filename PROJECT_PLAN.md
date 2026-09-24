@@ -2,7 +2,7 @@
 
 > _Kairos (καιρός): the right, opportune moment._ Never miss the right moment to apply.
 
-Repository: `kairos-board` · License: MIT
+Repository: [GbotemiB/kairos-board](https://github.com/GbotemiB/kairos-board) · Live: [kairos-board.netlify.app](https://kairos-board.netlify.app) · License: MIT
 
 ## 🌟 1. Project Overview
 
@@ -233,7 +233,7 @@ To maintain a high-quality open-source project, testing is built in from the sta
 - [x] Set up testing (Vitest, React Testing Library).
 - [x] Set up Supabase CLI with local dev, migrations (schema, enums, view, RLS), and a seed script.
 - [x] Generate Supabase TypeScript types.
-- [ ] Create GitHub repo `kairos-board` (user) and link it to Netlify (user).
+- [x] Create GitHub repo `kairos-board` (user) and link it to Netlify (user).
 - [x] GitHub Actions: CI (lint, typecheck, unit tests) on PRs, migrations on `main`, scheduled Supabase keep-alive.
 - [x] Add `netlify.toml` (build command, Node version).
 
