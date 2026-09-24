@@ -1,0 +1,29 @@
+name: Supabase keep-alive
+
+# Free Supabase projects pause after ~1 week without activity.
+# Note: GitHub disables scheduled workflows after 60 days without repo activity.
+on:
+  schedule:
+    - cron: "0 9 */3 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query the public board
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ vars.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_PUBLISHABLE_KEY" ]; then
+            echo "::error::Set repository variables SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY"
+            exit 1
+          fi
+          curl --fail --silent --show-error --max-time 30 \
+            "$SUPABASE_URL/rest/v1/programs_public?select=id&limit=1" \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" > /dev/null
+          echo "Supabase responded."

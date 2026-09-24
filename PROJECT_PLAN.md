@@ -228,14 +228,14 @@ To maintain a high-quality open-source project, testing is built in from the sta
 
 ### Phase 1: Foundation & Architecture
 
-- [ ] Initialize git and Next.js project (TypeScript, Tailwind, App Router), `.nvmrc`, `.env.example`, MIT `LICENSE`.
-- [ ] Configure ESLint and Prettier.
-- [ ] Set up testing (Vitest, React Testing Library).
-- [ ] Set up Supabase CLI with local dev, migrations (schema, enums, view, RLS), and a seed script.
-- [ ] Generate Supabase TypeScript types.
+- [x] Initialize git and Next.js project (TypeScript, Tailwind, App Router), `.nvmrc`, `.env.example`, MIT `LICENSE`.
+- [x] Configure ESLint, Prettier, and husky + lint-staged hooks.
+- [x] Set up testing (Vitest, React Testing Library).
+- [x] Set up Supabase CLI with local dev, migrations (schema, enums, view, RLS), and a seed script.
+- [x] Generate Supabase TypeScript types.
 - [ ] Create GitHub repo `kairos-board` (user) and link it to Netlify (user).
-- [ ] GitHub Actions: CI (lint, typecheck, unit tests) on PRs, migrations on `main`, scheduled Supabase keep-alive.
-- [ ] Add `netlify.toml` (build command, Node version).
+- [x] GitHub Actions: CI (lint, typecheck, unit tests) on PRs, migrations on `main`, scheduled Supabase keep-alive.
+- [x] Add `netlify.toml` (build command, Node version).
 
 ### Phase 2: Core UI & Public Board
 
