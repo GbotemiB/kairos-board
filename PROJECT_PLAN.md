@@ -246,8 +246,8 @@ To maintain a high-quality open-source project, testing is built in from the sta
 ### M0: Local Setup
 
 - [x] Create `feat/mvp` from `main`.
-- [ ] Add `npm run check` (mirrors CI).
-- [ ] Create `.env.local` with the local Supabase URL and publishable key.
+- [x] Add `npm run check` (mirrors CI).
+- [x] Create `.env.local` with the local Supabase URL and publishable key.
 
 ### M1: The Board (Demo 1)
 

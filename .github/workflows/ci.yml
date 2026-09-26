@@ -49,9 +49,4 @@ jobs:
           -x gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,studio,edge-runtime,logflare,vector,supavisor
       - run: npm run db:test
       - name: Check generated types are up to date
-        run: |
-          npx supabase gen types typescript --local > "$RUNNER_TEMP/database.types.ts"
-          if ! diff -u src/lib/supabase/database.types.ts "$RUNNER_TEMP/database.types.ts"; then
-            echo "::error::database.types.ts is stale. Run 'npm run db:types' and commit the result."
-            exit 1
-          fi
+        run: npm run db:types:check

@@ -17,7 +17,9 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
-    "db:types": "mkdir -p src/lib/supabase && supabase gen types typescript --local > src/lib/supabase/database.types.ts"
+    "db:types": "mkdir -p src/lib/supabase && supabase gen types typescript --local > src/lib/supabase/database.types.ts",
+    "db:types:check": "supabase gen types typescript --local | diff -u src/lib/supabase/database.types.ts - || (echo \"database.types.ts is stale. Run: npm run db:types\" && exit 1)",
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run db:test && npm run db:types:check"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
