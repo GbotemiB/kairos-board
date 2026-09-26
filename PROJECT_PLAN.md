@@ -262,8 +262,8 @@ To maintain a high-quality open-source project, testing is built in from the sta
 - [x] SSRF-safe fetch (with tests).
 - [x] JSON-LD and main-text extraction with `cheerio`, thin-content detection (fixture tests).
 - [x] Gemini integration (zod schema as `responseJsonSchema`, validation, sanitizing, model fallback within a time budget, JSON-LD merge).
-- [ ] `extractProgram()` pipeline (typed error codes, paste-text mode) with tests (mocked Gemini and network).
-- [ ] `npm run extract -- <url>` dev script to try real pages without auth, logging extraction time.
+- [x] `extractProgram()` pipeline (typed error codes, paste-text mode) with tests (mocked Gemini and network).
+- [x] `npm run extract -- <url>` dev script to try real pages without auth, logging extraction time.
 - [ ] **Demo:** run against 5-10 real opportunity URLs and judge quality.
 - [ ] **Decision gate:** tune the prompt/pipeline if quality is poor before building M3 on top.
 - Requires: Gemini API key (Google AI Studio, free tier) in `.env.local`.
