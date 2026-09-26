@@ -226,49 +226,76 @@ To maintain a high-quality open-source project, testing is built in from the sta
 
 ## 🗺️ 5. Implementation Roadmap
 
-### Phase 1: Foundation & Architecture
+### Workflow: local first, then go online
 
-- [x] Initialize git and Next.js project (TypeScript, Tailwind, App Router), `.nvmrc`, `.env.example`, MIT `LICENSE`.
-- [x] Configure ESLint, Prettier, and husky + lint-staged hooks.
-- [x] Set up testing (Vitest, React Testing Library).
-- [x] Set up Supabase CLI with local dev, migrations (schema, enums, view, RLS), and a seed script.
-- [x] Generate Supabase TypeScript types.
-- [x] Create GitHub repo `kairos-board` (user) and link it to Netlify (user).
-- [x] GitHub Actions: CI (lint, typecheck, unit tests) on PRs, migrations on `main`, scheduled Supabase keep-alive.
-- [x] Add `netlify.toml` (build command, Node version).
+- All MVP work happens on one local branch, `feat/mvp`, with one conventional commit per step. Nothing is pushed until milestone M5.
+- `npm run check` mirrors CI (format, lint, typecheck, unit tests, build, database tests, generated types) and must pass at the end of every step.
+- Local auth uses email/password against local Supabase (emails captured by Mailpit at `http://127.0.0.1:54324`). OAuth apps are only set up when going online.
+- Each milestone ends with a demo the maintainer runs locally before moving on.
 
-### Phase 2: Core UI & Public Board
+### ✅ Done: Foundation & Setup (merged, PRs #1-#4)
 
-- [ ] Build global layout (Navbar, Footer).
-- [ ] Create `ProgramCard` component (with tests).
-- [ ] Fetch from `programs_public` and render the board.
-- [ ] Add filtering (status, type), search (title/organization), and pagination.
+- [x] Next.js (TypeScript, Tailwind, App Router), ESLint, Prettier, husky + lint-staged, `.nvmrc`, `.env.example`, MIT `LICENSE`.
+- [x] Vitest + React Testing Library.
+- [x] Supabase CLI, migrations (schema, enums, view, RLS, column grants), seed data, 38 pgTAP database tests, generated types.
+- [x] GitHub repo, CI, migrations deploy on `main`, Supabase keep-alive, Netlify (`kairos-board.netlify.app`).
+- [x] GitHub Actions on v7 (Node 24), PR template.
+- [x] Global layout (header, footer), shadcn/ui, cookie-less public Supabase client.
+- [x] `ProgramCard` with deadline/status logic and tests.
 
-### Phase 3: The AI Engine (Backend)
+### M0: Local Setup
 
-- [ ] URL validation and normalization utilities (with tests).
-- [ ] SSRF-safe fetch utility (with tests).
-- [ ] JSON-LD and main-text extraction with `cheerio` (with fixture tests).
+- [x] Create `feat/mvp` from `main`.
+- [ ] Add `npm run check` (mirrors CI).
+- [ ] Create `.env.local` with the local Supabase URL and publishable key.
+
+### M1: The Board (Demo 1)
+
+- [ ] Board page reading `programs_public` with the public client.
+- [ ] Empty and error states.
+- [ ] Refresh strategy so deadline countdowns stay current (e.g. hourly).
+- [ ] **Demo:** `npm run db:start` + `npm run dev`, see the 8 seed programs.
+
+### M2: AI Extraction Engine (Demo 2)
+
+- [ ] URL validation, normalization, and duplicate check (with tests).
+- [ ] SSRF-safe fetch (with tests).
+- [ ] JSON-LD and main-text extraction with `cheerio`, thin-content detection (fixture tests).
 - [ ] Gemini integration with `responseSchema` + zod validation.
 - [ ] Rate limiting via `extraction_logs`.
-- [ ] `/api/extract` route with paste-text mode and error codes.
-- [ ] Integration tests for the route (mocked Gemini and network).
+- [ ] `/api/extract` route with paste-text mode and error codes, plus integration tests (mocked Gemini and network).
+- [ ] `npm run extract -- <url>` dev script to try real pages without auth, logging extraction time.
+- [ ] **Demo:** run against 5-10 real opportunity URLs and judge quality.
+- [ ] **Decision gate:** tune the prompt/pipeline if quality is poor before building M3 on top.
+- Requires: Gemini API key (Google AI Studio, free tier) in `.env.local`.
 
-### Phase 4: Authentication & Submission
+### M3: Authentication & Submission (Demo 3, full flow)
 
-- [ ] Implement Supabase Auth (GitHub/Google OAuth, plus email/password for testing).
-- [ ] Build the "Add Program" form with AI auto-fill, warnings, and paste-text/manual fallbacks.
-- [ ] Handle duplicates (link to existing program).
-- [ ] Connect the form to Supabase for insertion. Allow editing and deleting own submissions.
-- [ ] RLS policy tests.
-- [ ] Playwright E2E for the submission flow (added to CI).
+- [ ] Supabase email/password auth, session-aware server/browser clients, session refresh.
+- [ ] "Add Program" form: AI auto-fill, review and correct, warnings, paste-text and manual fallbacks.
+- [ ] Duplicate handling (link to existing program).
+- [ ] Insert into Supabase. Edit and delete own submissions.
+- [ ] Playwright E2E for the full submission flow.
+- [ ] **Demo:** sign up locally, paste a link, review, submit, see it on the board.
 
-### Phase 5: Moderation, Open-Source Polish & Deploy
+### M4: Board Polish
 
-- [ ] "Report" button and `reports` table. Maintainers hide entries via `is_hidden`.
-- [ ] Write a comprehensive `README.md` (setup, tech stack, env vars).
-- [ ] Write a `CONTRIBUTING.md` (running tests, local Supabase, PR guidelines).
-- [ ] Production deploy on Netlify (env vars, OAuth redirect URLs, custom domain optional).
+- [ ] Filtering (status, type), search (title/organization), and pagination, kept in the URL.
+
+### M5: Go Online
+
+- [ ] Push `feat/mvp`, open one PR. CI (including Playwright) and the Netlify deploy preview must pass.
+- [ ] Add `GEMINI_API_KEY` to Netlify (secret, not exposed to fork deploy previews).
+- [ ] Create GitHub and Google OAuth apps. Add Netlify production and preview URLs to the Supabase Auth redirect allow-list.
+- [ ] Verify `/api/extract` fits Netlify's 10s function budget on the deploy preview.
+- [ ] Merge. Migrations deploy automatically. Smoke test production.
+
+### M6: After Launch
+
+- [ ] "Report" button (the `reports` table already exists). Maintainers hide entries via `is_hidden`.
+- [ ] Comprehensive `README.md` (setup, tech stack, env vars) and `CONTRIBUTING.md` (tests, local Supabase, PR guidelines).
+- [ ] Theme toggle (dark mode).
+- [ ] Custom domain (optional).
 
 ### Later / Nice to Have
 
