@@ -251,10 +251,10 @@ To maintain a high-quality open-source project, testing is built in from the sta
 
 ### M1: The Board (Demo 1)
 
-- [ ] Board page reading `programs_public` with the public client.
-- [ ] Empty and error states.
-- [ ] Refresh strategy so deadline countdowns stay current (e.g. hourly).
-- [ ] **Demo:** `npm run db:start` + `npm run dev`, see the 8 seed programs.
+- [x] Board page reading `programs_public` with the public client.
+- [x] Empty and error states.
+- [x] Refresh strategy so deadline countdowns stay current: rendered per request via `connection()` (filters in M4 make it dynamic anyway, and CI builds need no database).
+- [x] **Demo:** `npm run db:start` + `npm run dev`, see the 8 seed programs.
 
 ### M2: AI Extraction Engine (Demo 2)
 
