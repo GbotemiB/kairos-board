@@ -258,12 +258,11 @@ To maintain a high-quality open-source project, testing is built in from the sta
 
 ### M2: AI Extraction Engine (Demo 2)
 
-- [ ] URL validation, normalization, and duplicate check (with tests).
+- [x] URL validation, normalization, and duplicate check (with tests).
 - [ ] SSRF-safe fetch (with tests).
 - [ ] JSON-LD and main-text extraction with `cheerio`, thin-content detection (fixture tests).
 - [ ] Gemini integration with `responseSchema` + zod validation.
-- [ ] Rate limiting via `extraction_logs`.
-- [ ] `/api/extract` route with paste-text mode and error codes, plus integration tests (mocked Gemini and network).
+- [ ] `extractProgram()` pipeline (typed error codes, paste-text mode) with tests (mocked Gemini and network).
 - [ ] `npm run extract -- <url>` dev script to try real pages without auth, logging extraction time.
 - [ ] **Demo:** run against 5-10 real opportunity URLs and judge quality.
 - [ ] **Decision gate:** tune the prompt/pipeline if quality is poor before building M3 on top.
@@ -272,6 +271,8 @@ To maintain a high-quality open-source project, testing is built in from the sta
 ### M3: Authentication & Submission (Demo 3, full flow)
 
 - [ ] Supabase email/password auth, session-aware server/browser clients, session refresh.
+- [ ] `/api/extract` route (auth required) wrapping `extractProgram()`, with integration tests. Moved from M2: needs a session.
+- [ ] Rate limiting via `extraction_logs` (per user). Moved from M2: needs a session.
 - [ ] "Add Program" form: AI auto-fill, review and correct, warnings, paste-text and manual fallbacks.
 - [ ] Duplicate handling (link to existing program).
 - [ ] Insert into Supabase. Edit and delete own submissions.
