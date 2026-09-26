@@ -259,7 +259,7 @@ To maintain a high-quality open-source project, testing is built in from the sta
 ### M2: AI Extraction Engine (Demo 2)
 
 - [x] URL validation, normalization, and duplicate check (with tests).
-- [ ] SSRF-safe fetch (with tests).
+- [x] SSRF-safe fetch (with tests).
 - [ ] JSON-LD and main-text extraction with `cheerio`, thin-content detection (fixture tests).
 - [ ] Gemini integration with `responseSchema` + zod validation.
 - [ ] `extractProgram()` pipeline (typed error codes, paste-text mode) with tests (mocked Gemini and network).
