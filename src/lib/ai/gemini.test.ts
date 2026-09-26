@@ -46,6 +46,7 @@ const VALID = {
   field: null,
   funding: null,
   applicationsClosed: false,
+  openToMasters: "YES",
 };
 
 describe("thinkingConfigFor", () => {

@@ -22,6 +22,9 @@ export const aiExtractionSchema = z.object({
   applicationsClosed: z
     .boolean()
     .describe("True only if the page explicitly says applications are closed"),
+  openToMasters: z
+    .enum(["YES", "NO", "UNCLEAR"])
+    .describe("Whether master's students can apply, based on the stated eligibility"),
 });
 
 export type AiExtraction = z.infer<typeof aiExtractionSchema>;
@@ -57,6 +60,8 @@ export type ExtractedProgram = {
   field: string | null;
   funding: string | null;
   applicationsClosed: boolean;
+  /** Review-only signal; not stored. */
+  openToMasters: "YES" | "NO" | "UNCLEAR";
 };
 
 function cleanText(value: string | null, max: number): string | null {
@@ -114,5 +119,6 @@ export function sanitizeExtraction(raw: AiExtraction): ExtractedProgram {
     field: cleanText(raw.field, FIELD_LIMITS.field),
     funding: cleanText(raw.funding, FIELD_LIMITS.funding),
     applicationsClosed: raw.applicationsClosed,
+    openToMasters: raw.openToMasters,
   };
 }

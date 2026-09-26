@@ -63,6 +63,7 @@ function raw(overrides: Partial<AiExtraction> = {}): AiExtraction {
     field: "Climate policy",
     funding: "Monthly stipend",
     applicationsClosed: false,
+    openToMasters: "YES",
     ...overrides,
   };
 }
@@ -83,6 +84,7 @@ describe("toGeminiSchema", () => {
     const properties = schema["properties"] as Record<string, { enum?: string[] }>;
     expect(properties["type"].enum).toEqual(["INTERNSHIP", "FELLOWSHIP", "PROGRAM", "OTHER"]);
     expect(properties["deadlineType"].enum).toEqual(["FIXED", "ROLLING", "UNKNOWN"]);
+    expect(properties["openToMasters"].enum).toEqual(["YES", "NO", "UNCLEAR"]);
   });
 
   it("forbids extra properties", () => {

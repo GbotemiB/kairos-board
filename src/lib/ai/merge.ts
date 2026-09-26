@@ -14,6 +14,7 @@ export const EMPTY_EXTRACTION: ExtractedProgram = {
   field: null,
   funding: null,
   applicationsClosed: false,
+  openToMasters: "UNCLEAR",
 };
 
 /**

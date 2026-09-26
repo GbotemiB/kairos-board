@@ -87,3 +87,9 @@ describe("SYSTEM_INSTRUCTION", () => {
     expect(SYSTEM_INSTRUCTION).toContain("YYYY-MM-DD");
   });
 });
+
+describe("SYSTEM_INSTRUCTION master's eligibility", () => {
+  it("explains how to judge whether master's students can apply", () => {
+    expect(SYSTEM_INSTRUCTION).toMatch(/openToMasters: YES .* NO .* UNCLEAR/);
+  });
+});

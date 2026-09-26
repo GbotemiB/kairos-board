@@ -101,6 +101,9 @@ export function buildWarnings(
   if (deadline !== null && daysUntil(deadline, now) < 0) {
     warnings.push("The deadline has already passed.");
   }
+  if (data.openToMasters === "NO") {
+    warnings.push("This may not be open to master's students.");
+  }
   if (data.applicationsClosed) {
     warnings.push("The page says applications are closed.");
   }

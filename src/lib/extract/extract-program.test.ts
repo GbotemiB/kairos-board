@@ -25,6 +25,7 @@ const AI_JSON = {
   field: "Climate policy",
   funding: "Stipend",
   applicationsClosed: false,
+  openToMasters: "YES",
 };
 
 const LONG_TEXT = "The Example Climate Institute invites applications. ".repeat(20);
@@ -274,6 +275,7 @@ describe("buildWarnings", () => {
     field: null,
     funding: null,
     applicationsClosed: false,
+    openToMasters: "YES",
   };
   const now = new Date(NOW);
   const notTruncated = { textTruncated: false };
@@ -302,6 +304,16 @@ describe("buildWarnings", () => {
       "The deadline has already passed.",
     ]);
     expect(buildWarnings({ ...base, deadline: "2026-09-26" }, notTruncated, now)).toEqual([]);
+  });
+
+  it("warns when the program may not be open to master's students", () => {
+    expect(buildWarnings({ ...base, openToMasters: "NO" }, notTruncated, now)).toEqual([
+      "This may not be open to master's students.",
+    ]);
+  });
+
+  it("does not warn when eligibility for master's students is unclear", () => {
+    expect(buildWarnings({ ...base, openToMasters: "UNCLEAR" }, notTruncated, now)).toEqual([]);
   });
 
   it("warns when applications are closed", () => {

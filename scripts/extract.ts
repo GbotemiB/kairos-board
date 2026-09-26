@@ -60,6 +60,7 @@ function printResult(result: ExtractResult) {
     line("Field", data.field);
     line("Funding", data.funding);
     line("Closed", data.applicationsClosed);
+    line("For master's", data.openToMasters);
     console.log("  Eligibility");
     for (const item of data.eligibility) console.log(`    - ${item}`);
     if (data.eligibility.length === 0) console.log("    -");

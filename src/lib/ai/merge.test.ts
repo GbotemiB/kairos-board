@@ -20,6 +20,7 @@ const AI: ExtractedProgram = {
   field: "Climate",
   funding: "Stipend",
   applicationsClosed: false,
+  openToMasters: "YES",
 };
 
 const STRUCTURED: StructuredHints = {
