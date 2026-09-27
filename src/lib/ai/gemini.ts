@@ -9,9 +9,12 @@ import {
 } from "@/lib/ai/schema";
 import { SYSTEM_INSTRUCTION, buildExtractionPrompt, type PromptInput } from "@/lib/ai/prompt";
 
-/** Chosen by benchmark (2026-09-26): fastest accurate model, plus a fallback. */
-export const DEFAULT_MODEL = "gemini-3.5-flash-lite";
-export const DEFAULT_FALLBACK_MODEL = "gemini-2.5-flash";
+/**
+ * Chosen by benchmark (2026-09-26). Both were equally accurate; 2.5-flash is
+ * the primary because 3.5-flash-lite's latency swung from ~1.5s to 15s+ under load.
+ */
+export const DEFAULT_MODEL = "gemini-2.5-flash";
+export const DEFAULT_FALLBACK_MODEL = "gemini-3.5-flash-lite";
 /** Per-attempt timeout. */
 export const ATTEMPT_TIMEOUT_MS = 4_000;
 /** Do not start an attempt with less time than this left. */

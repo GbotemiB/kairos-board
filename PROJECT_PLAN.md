@@ -264,8 +264,9 @@ To maintain a high-quality open-source project, testing is built in from the sta
 - [x] Gemini integration (zod schema as `responseJsonSchema`, validation, sanitizing, model fallback within a time budget, JSON-LD merge).
 - [x] `extractProgram()` pipeline (typed error codes, paste-text mode) with tests (mocked Gemini and network).
 - [x] `npm run extract -- <url>` dev script to try real pages without auth, logging extraction time.
-- [ ] **Demo:** run against 5-10 real opportunity URLs and judge quality.
-- [ ] **Decision gate:** tune the prompt/pipeline if quality is poor before building M3 on top.
+- [x] **Demo:** 8 real pages (Hertz, PD Soros, Duke, 4 Greenhouse postings, SSP). All facts spot-checked correct, no invented deadlines, 3-5s typical. Added an `openToMasters` signal after PhD-only / high-school pages passed unflagged.
+- [x] **Decision gate:** quality is good enough to build on. Primary model switched to `gemini-2.5-flash` (stable ~1.5s) with `gemini-3.5-flash-lite` as fallback (latency swung to 15s+ under load).
+- Note: the Gemini **free tier rate-limits** (HTTP 429 seen after ~60 calls in a day). The per-user rate limit in M3 must protect the shared quota, and a 429 should show a "busy, try again shortly" message.
 - Requires: Gemini API key (Google AI Studio, free tier) in `.env.local`.
 
 ### M3: Authentication & Submission (Demo 3, full flow)
