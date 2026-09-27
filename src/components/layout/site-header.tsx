@@ -1,8 +1,15 @@
 import Link from "next/link";
 
+import { signOut } from "@/app/auth/actions";
+import { Button } from "@/components/ui/button";
+import type { CurrentUser } from "@/lib/auth/session";
 import { siteConfig } from "@/lib/site";
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  user: CurrentUser | null;
+};
+
+export function SiteHeader({ user }: SiteHeaderProps) {
   return (
     <header className="border-b">
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
@@ -21,6 +28,18 @@ export function SiteHeader() {
           >
             GitHub
           </a>
+          {user === null ? (
+            <Link href="/login" className="text-muted-foreground hover:text-foreground">
+              Sign in
+            </Link>
+          ) : (
+            <form action={signOut} className="flex items-center gap-3">
+              <span className="text-muted-foreground hidden sm:inline">{user.email}</span>
+              <Button type="submit" variant="outline" size="sm">
+                Sign out
+              </Button>
+            </form>
+          )}
         </nav>
       </div>
     </header>
