@@ -21,7 +21,8 @@ export type ExtractErrorCode =
   | "FETCH_FAILED"
   | "UNSUPPORTED_CONTENT"
   | "THIN_CONTENT"
-  | "AI_FAILED";
+  | "AI_FAILED"
+  | "AI_BUSY";
 
 export type Stage = "validate" | "duplicate" | "fetch" | "read" | "ai";
 export type Timings = Partial<Record<Stage, number>> & { total: number };
@@ -83,6 +84,16 @@ function pastedPage(text: string): PageContent {
     textTruncated: cleaned.length > MAX_TEXT_CHARS,
     isThin: cleaned.length < MIN_PASTED_CHARS,
   };
+}
+
+/** Quota exhausted (429) or model overloaded (503): worth retrying shortly. */
+const BUSY_ERROR = /\b(429|503)\b|RESOURCE_EXHAUSTED|UNAVAILABLE|high demand|quota/i;
+
+export function isAiBusy(attempts: AttemptLog[]): boolean {
+  return (
+    attempts.length > 0 &&
+    attempts.every((attempt) => attempt.error !== null && BUSY_ERROR.test(attempt.error))
+  );
 }
 
 export function buildWarnings(
@@ -215,6 +226,13 @@ export async function extractProgram(
 
   const data = mergeExtraction(ai.ok ? ai.data : null, page.structured, page.meta);
   if (!ai.ok) {
+    if (isAiBusy(ai.attempts)) {
+      return fail(
+        "AI_BUSY",
+        "The AI is busy right now. Try again in a minute, or fill in the details yourself.",
+        { normalizedUrl, partial: data },
+      );
+    }
     return fail("AI_FAILED", "Automatic extraction failed. Please fill in the details.", {
       normalizedUrl,
       partial: data,

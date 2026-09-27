@@ -1,7 +1,7 @@
 -- Derived status, constraints and triggers. Run with `npm run db:test`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(12);
 
 -- ---------------------------------------------------------------------------
 -- Derived status in programs_public
@@ -81,6 +81,23 @@ select is(
   (select updated_at from public.programs where url = 'https://status.test/trigger'),
   now(),
   'updated_at is refreshed on update'
+);
+
+-- ---------------------------------------------------------------------------
+-- extraction_logs outcome values
+-- ---------------------------------------------------------------------------
+insert into auth.users (id, email) values ('cccccccc-0000-0000-0000-000000000003', 'logs@test.local');
+
+select lives_ok(
+  $$insert into public.extraction_logs (user_id, url_normalized, outcome)
+    values ('cccccccc-0000-0000-0000-000000000003', 'https://status.test/busy', 'AI_BUSY')$$,
+  'AI_BUSY is an accepted extraction outcome'
+);
+select throws_ok(
+  $$insert into public.extraction_logs (user_id, url_normalized, outcome)
+    values ('cccccccc-0000-0000-0000-000000000003', 'https://status.test/bogus', 'BOGUS')$$,
+  '23514', null,
+  'unknown extraction outcomes are rejected'
 );
 
 select * from finish();

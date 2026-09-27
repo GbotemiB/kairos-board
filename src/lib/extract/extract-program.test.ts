@@ -6,6 +6,7 @@ import {
   MIN_PASTED_CHARS,
   buildWarnings,
   extractProgram,
+  isAiBusy,
   type ExtractDeps,
 } from "@/lib/extract/extract-program";
 import type { DuplicateCheckResult } from "@/lib/programs/duplicates";
@@ -229,7 +230,9 @@ describe("extractProgram", () => {
   });
 
   it("returns AI_FAILED with partial data from page metadata when every model fails", async () => {
-    const d = deps({ generate: vi.fn<GenerateJson>().mockRejectedValue(new Error("503")) });
+    const d = deps({
+      generate: vi.fn<GenerateJson>().mockRejectedValue(new Error("400 invalid argument")),
+    });
 
     const result = await extractProgram({ url: "https://example.org/fellowship" }, d);
 
@@ -238,9 +241,41 @@ describe("extractProgram", () => {
       code: "AI_FAILED",
       partial: { title: "Fellowship" },
       attempts: [
-        { model: "primary", error: "503" },
-        { model: "fallback", error: "503" },
+        { model: "primary", error: "400 invalid argument" },
+        { model: "fallback", error: "400 invalid argument" },
       ],
+    });
+  });
+
+  it.each([
+    ["quota exhausted", '{"error":{"code":429,"message":"You exceeded your current quota"}}'],
+    [
+      "overloaded",
+      '{"error":{"code":503,"message":"This model is currently experiencing high demand"}}',
+    ],
+  ])("returns AI_BUSY with partial data when every model is %s", async (_name, message) => {
+    const d = deps({ generate: vi.fn<GenerateJson>().mockRejectedValue(new Error(message)) });
+
+    const result = await extractProgram({ url: "https://example.org/fellowship" }, d);
+
+    expect(result).toMatchObject({
+      ok: false,
+      code: "AI_BUSY",
+      message: expect.stringMatching(/busy/),
+      partial: { title: "Fellowship" },
+    });
+  });
+
+  it("returns AI_FAILED, not AI_BUSY, when only some attempts were busy", async () => {
+    const d = deps({
+      generate: vi
+        .fn<GenerateJson>()
+        .mockRejectedValueOnce(new Error("429 quota"))
+        .mockResolvedValueOnce("not json"),
+    });
+
+    expect(await extractProgram({ url: "https://example.org/fellowship" }, d)).toMatchObject({
+      code: "AI_FAILED",
     });
   });
 
@@ -326,5 +361,40 @@ describe("buildWarnings", () => {
     expect(buildWarnings(base, { textTruncated: true }, now)).toEqual([
       "The page is very long; only the first part was read.",
     ]);
+  });
+});
+
+describe("isAiBusy", () => {
+  const attempt = (error: string | null) => ({ model: "m", ms: 1, error });
+
+  it.each([
+    "429 Too Many Requests",
+    '{"error":{"code":503}}',
+    "RESOURCE_EXHAUSTED",
+    "UNAVAILABLE",
+    "high demand",
+    "You exceeded your current quota",
+  ])("treats %j as busy", (error) => {
+    expect(isAiBusy([attempt(error)])).toBe(true);
+  });
+
+  it.each([["timed out"], ["response did not match schema"], ["400 invalid argument"]])(
+    "does not treat %j as busy",
+    (error) => {
+      expect(isAiBusy([attempt(error)])).toBe(false);
+    },
+  );
+
+  it("requires every attempt to be busy", () => {
+    expect(isAiBusy([attempt("429"), attempt("timed out")])).toBe(false);
+    expect(isAiBusy([attempt("429"), attempt("503")])).toBe(true);
+  });
+
+  it("is false when nothing was attempted", () => {
+    expect(isAiBusy([])).toBe(false);
+  });
+
+  it("ignores successful attempts", () => {
+    expect(isAiBusy([attempt(null)])).toBe(false);
   });
 });

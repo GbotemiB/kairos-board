@@ -272,8 +272,8 @@ To maintain a high-quality open-source project, testing is built in from the sta
 ### M3: Authentication & Submission (Demo 3, full flow)
 
 - [x] Supabase email/password auth, session-aware server client, session refresh in `proxy.ts`, `/login`, `/signup`, `/auth/confirm`, safe `?next=` redirects.
-- [ ] `/api/extract` route (auth required) wrapping `extractProgram()`, with integration tests. Moved from M2: needs a session.
-- [ ] Rate limiting via `extraction_logs` (per user). Moved from M2: needs a session.
+- [x] `/api/extract` route (auth required) wrapping `extractProgram()`, with integration tests. Moved from M2: needs a session.
+- [x] Rate limiting via `extraction_logs` (per user). Moved from M2: needs a session.
 - [ ] "Add Program" form: AI auto-fill, review and correct, warnings, paste-text and manual fallbacks.
 - [ ] Duplicate handling (link to existing program).
 - [ ] Insert into Supabase. Edit and delete own submissions.
