@@ -5,7 +5,7 @@ import { getSupabaseConfig } from "@/lib/supabase/config";
 import type { Database } from "@/lib/supabase/database.types";
 
 /** Pages that need a signed-in user. The page itself re-checks (see requireUser). */
-const PROTECTED_PREFIXES = ["/submit"];
+const PROTECTED_PREFIXES = ["/submit", "/my"];
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(

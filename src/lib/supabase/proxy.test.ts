@@ -87,7 +87,7 @@ describe("updateSession", () => {
   });
 
   describe("protected pages", () => {
-    it.each(["/submit", "/submit/", "/submit/step"])(
+    it.each(["/submit", "/submit/", "/submit/step", "/my", "/my/abc/edit"])(
       "redirects signed-out visitors from %s to login",
       async (path) => {
         mocks.getClaims.mockResolvedValue({ data: null, error: null });
@@ -109,7 +109,7 @@ describe("updateSession", () => {
       expect(response.headers.get("location")).toBeNull();
     });
 
-    it.each(["/", "/login", "/submitted", "/api/extract"])(
+    it.each(["/", "/login", "/submitted", "/mystery", "/api/extract"])(
       "does not redirect from %s",
       async (path) => {
         mocks.getClaims.mockResolvedValue({ data: null, error: null });

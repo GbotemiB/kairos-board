@@ -15,7 +15,7 @@ vi.mock("next/server", () => ({ connection: mocks.connection }));
 vi.mock("@/lib/programs/queries", () => ({ getBoardPrograms: mocks.getBoardPrograms }));
 vi.mock("@/lib/supabase/public", () => ({ createPublicClient: mocks.createPublicClient }));
 
-import Home from "@/app/page";
+import Home from "@/app/(board)/page";
 
 function makeProgram(id: string, title: string): Program {
   return {

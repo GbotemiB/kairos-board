@@ -277,13 +277,22 @@ To maintain a high-quality open-source project, testing is built in from the sta
 - [x] "Add Program" form (`/submit`): AI auto-fill, review and correct, warnings, paste-text and manual fallbacks.
 - [x] Duplicate handling (link to existing program).
 - [x] Insert into Supabase via a Server Action (shared zod parser, unique-constraint message).
-- [ ] "My submissions": edit and delete own submissions.
+- [x] "My submissions" (`/my`): edit (same form + validation) and delete (inline confirm), ownership filtered on id + submitter.
 - [ ] Playwright E2E for the full submission flow.
 - [ ] **Demo:** sign up locally, paste a link, review, submit, see it on the board.
 
 ### M4: Board Polish
 
-- [ ] Filtering (status, type), search (title/organization), and pagination, kept in the URL.
+Decided 2026-09-28 after the M3.3 demo (build after M3 is finished):
+
+- [ ] Status filter: Open / Upcoming / Closed. **Default: open + upcoming** (closed via the filter or "All").
+- [ ] Type filter (multi-select): Internship, Fellowship, Program, Other.
+- [ ] Search box (title, organization).
+- [ ] Sort: deadline soonest (default) or newest added.
+- [ ] View toggle: **Cards / List** (compact table: title, organization, type, status, deadline, location).
+- [ ] All state in the URL (shareable); GET form works without JavaScript; "Clear filters"; empty state for no matches.
+- [ ] Pagination.
+- Location filter: skipped for now (free-text locations). Revisit with an AI-filled `country` column if needed.
 
 ### M5: Go Online
 

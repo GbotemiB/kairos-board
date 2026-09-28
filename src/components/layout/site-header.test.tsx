@@ -34,12 +34,14 @@ describe("SiteHeader", () => {
 
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/login");
     expect(screen.queryByRole("button", { name: "Sign out" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "My submissions" })).not.toBeInTheDocument();
   });
 
   it("shows the email and a sign-out button when signed in", () => {
     render(<SiteHeader user={{ id: "user-1", email: "me@example.org" }} />);
 
     expect(screen.getByText("me@example.org")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "My submissions" })).toHaveAttribute("href", "/my");
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument();
   });

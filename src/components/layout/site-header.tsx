@@ -36,6 +36,11 @@ export function SiteHeader({ user }: SiteHeaderProps) {
               Sign in
             </Link>
           ) : (
+            <Link href="/my" className="text-muted-foreground hover:text-foreground">
+              My submissions
+            </Link>
+          )}
+          {user !== null && (
             <form action={signOut} className="flex items-center gap-3">
               <span className="text-muted-foreground hidden sm:inline">{user.email}</span>
               <Button type="submit" variant="outline" size="sm">
