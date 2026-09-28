@@ -6,10 +6,11 @@ import { getBoardPrograms } from "@/lib/programs/queries";
 import { siteConfig } from "@/lib/site";
 import { createPublicClient } from "@/lib/supabase/public";
 
-export default async function Home() {
+export default async function Home({ searchParams }: PageProps<"/">) {
   // Render per request so deadline countdowns are always current.
   await connection();
 
+  const justAdded = (await searchParams).added === "1";
   const result = await getBoardPrograms(createPublicClient());
   const now = new Date();
 
@@ -19,6 +20,15 @@ export default async function Home() {
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{siteConfig.tagline}</h1>
         <p className="text-muted-foreground max-w-2xl text-lg">{siteConfig.description}</p>
       </section>
+
+      {justAdded && (
+        <p
+          role="status"
+          className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-950"
+        >
+          Thanks! Your program is now on the board.
+        </p>
+      )}
 
       {!result.ok ? (
         <BoardErrorState />

@@ -85,4 +85,51 @@ describe("updateSession", () => {
 
     expect(response.headers.get("cache-control")).toBeNull();
   });
+
+  describe("protected pages", () => {
+    it.each(["/submit", "/submit/", "/submit/step"])(
+      "redirects signed-out visitors from %s to login",
+      async (path) => {
+        mocks.getClaims.mockResolvedValue({ data: null, error: null });
+
+        const response = await updateSession(new NextRequest(`http://localhost:3000${path}?x=1`));
+
+        expect(response.status).toBe(307);
+        expect(response.headers.get("location")).toBe(
+          `http://localhost:3000/login?next=${encodeURIComponent(`${path}?x=1`)}`,
+        );
+      },
+    );
+
+    it("lets signed-in users through", async () => {
+      mocks.getClaims.mockResolvedValue({ data: { claims: { sub: "user-1" } }, error: null });
+
+      const response = await updateSession(new NextRequest("http://localhost:3000/submit"));
+
+      expect(response.headers.get("location")).toBeNull();
+    });
+
+    it.each(["/", "/login", "/submitted", "/api/extract"])(
+      "does not redirect from %s",
+      async (path) => {
+        mocks.getClaims.mockResolvedValue({ data: null, error: null });
+
+        const response = await updateSession(new NextRequest(`http://localhost:3000${path}`));
+
+        expect(response.headers.get("location")).toBeNull();
+      },
+    );
+
+    it("keeps cookie changes on the redirect", async () => {
+      mocks.getClaims.mockImplementation(async () => {
+        mocks.cookies?.setAll([{ name: "sb-auth-token", value: "", options: { maxAge: 0 } }], {});
+        return { data: null, error: null };
+      });
+
+      const response = await updateSession(new NextRequest("http://localhost:3000/submit"));
+
+      expect(response.status).toBe(307);
+      expect(response.cookies.get("sb-auth-token")?.value).toBe("");
+    });
+  });
 });

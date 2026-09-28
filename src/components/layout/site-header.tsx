@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { signOut } from "@/app/auth/actions";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import type { CurrentUser } from "@/lib/auth/session";
 import { siteConfig } from "@/lib/site";
 
@@ -28,6 +28,9 @@ export function SiteHeader({ user }: SiteHeaderProps) {
           >
             GitHub
           </a>
+          <Link href="/submit" className={buttonVariants({ size: "sm" })}>
+            Add program
+          </Link>
           {user === null ? (
             <Link href="/login" className="text-muted-foreground hover:text-foreground">
               Sign in

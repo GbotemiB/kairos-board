@@ -274,9 +274,10 @@ To maintain a high-quality open-source project, testing is built in from the sta
 - [x] Supabase email/password auth, session-aware server client, session refresh in `proxy.ts`, `/login`, `/signup`, `/auth/confirm`, safe `?next=` redirects.
 - [x] `/api/extract` route (auth required) wrapping `extractProgram()`, with integration tests. Moved from M2: needs a session.
 - [x] Rate limiting via `extraction_logs` (per user). Moved from M2: needs a session.
-- [ ] "Add Program" form: AI auto-fill, review and correct, warnings, paste-text and manual fallbacks.
-- [ ] Duplicate handling (link to existing program).
-- [ ] Insert into Supabase. Edit and delete own submissions.
+- [x] "Add Program" form (`/submit`): AI auto-fill, review and correct, warnings, paste-text and manual fallbacks.
+- [x] Duplicate handling (link to existing program).
+- [x] Insert into Supabase via a Server Action (shared zod parser, unique-constraint message).
+- [ ] "My submissions": edit and delete own submissions.
 - [ ] Playwright E2E for the full submission flow.
 - [ ] **Demo:** sign up locally, paste a link, review, submit, see it on the board.
 

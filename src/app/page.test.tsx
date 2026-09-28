@@ -35,8 +35,8 @@ function makeProgram(id: string, title: string): Program {
   };
 }
 
-async function renderHome() {
-  render(await Home());
+async function renderHome(searchParams: Record<string, string> = {}) {
+  render(await Home({ params: Promise.resolve({}), searchParams: Promise.resolve(searchParams) }));
 }
 
 describe("Home page (board)", () => {
@@ -88,6 +88,22 @@ describe("Home page (board)", () => {
 
     expect(screen.getByRole("region", { name: "No programs yet" })).toBeInTheDocument();
     expect(screen.queryByRole("article")).not.toBeInTheDocument();
+  });
+
+  it("thanks the user after adding a program", async () => {
+    mocks.getBoardPrograms.mockResolvedValue({ ok: true, programs: [] });
+
+    await renderHome({ added: "1" });
+
+    expect(screen.getByText("Thanks! Your program is now on the board.")).toBeInTheDocument();
+  });
+
+  it("does not show the thank-you banner normally", async () => {
+    mocks.getBoardPrograms.mockResolvedValue({ ok: true, programs: [] });
+
+    await renderHome();
+
+    expect(screen.queryByText(/Thanks!/)).not.toBeInTheDocument();
   });
 
   it("shows the error state when loading fails", async () => {

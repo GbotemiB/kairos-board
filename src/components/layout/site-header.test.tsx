@@ -43,4 +43,13 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("button", { name: "Sign out" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument();
   });
+
+  it.each([
+    ["signed out", null],
+    ["signed in", { id: "user-1", email: "me@example.org" }],
+  ])("links to the submit page when %s", (_name, user) => {
+    render(<SiteHeader user={user} />);
+
+    expect(screen.getByRole("link", { name: "Add program" })).toHaveAttribute("href", "/submit");
+  });
 });
