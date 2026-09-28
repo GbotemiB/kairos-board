@@ -1,16 +1,36 @@
 import Link from "next/link";
 
-export function BoardEmptyState() {
+type BoardEmptyStateProps = {
+  /** Shown when filters (or the default "open & upcoming" view) hide everything. */
+  clearHref?: string;
+  showAllHref?: string;
+};
+
+export function BoardEmptyState({ clearHref, showAllHref }: BoardEmptyStateProps = {}) {
+  const filtered = clearHref !== undefined;
   return (
     <section
       aria-labelledby="board-empty-title"
       className="rounded-lg border border-dashed p-8 text-center"
     >
       <h2 id="board-empty-title" className="text-lg font-semibold">
-        No programs yet
+        {filtered ? "No programs match these filters" : "No open programs right now"}
       </h2>
       <p className="text-muted-foreground mt-1">
-        Be the first to share an opportunity. Submissions open soon.
+        {filtered ? (
+          <Link href={clearHref} className="underline underline-offset-4">
+            Clear filters
+          </Link>
+        ) : showAllHref !== undefined ? (
+          <>
+            <Link href={showAllHref} className="underline underline-offset-4">
+              Show closed programs too
+            </Link>
+            , or be the first to share an opportunity.
+          </>
+        ) : (
+          "Be the first to share an opportunity."
+        )}
       </p>
     </section>
   );

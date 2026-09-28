@@ -279,19 +279,19 @@ To maintain a high-quality open-source project, testing is built in from the sta
 - [x] Insert into Supabase via a Server Action (shared zod parser, unique-constraint message).
 - [x] "My submissions" (`/my`): edit (same form + validation) and delete (inline confirm), ownership filtered on id + submitter.
 - [x] Playwright E2E (3 tests: full flow, manual entry + validation, invalid link) against a production build + local Supabase, Gemini mocked via `GOOGLE_GEMINI_BASE_URL`. Added as a CI job.
-- [ ] **Demo:** sign up locally, paste a link, review, submit, see it on the board.
+- [x] **Demo:** signed off 2026-09-28 (full flow tested by hand, plus E2E).
 
 ### M4: Board Polish
 
 Decided 2026-09-28 after the M3.3 demo (build after M3 is finished):
 
-- [ ] Status filter: Open / Upcoming / Closed. **Default: open + upcoming** (closed via the filter or "All").
-- [ ] Type filter (multi-select): Internship, Fellowship, Program, Other.
-- [ ] Search box (title, organization).
-- [ ] Sort: deadline soonest (default) or newest added.
-- [ ] View toggle: **Cards / List** (compact table: title, organization, type, status, deadline, location).
-- [ ] All state in the URL (shareable); GET form works without JavaScript; "Clear filters"; empty state for no matches.
-- [ ] Pagination.
+- [x] Status filter: Open / Upcoming / Closed. **Default: open + upcoming** (closed via the filter or "All").
+- [x] Type filter (multi-select): Internship, Fellowship, Program, Other.
+- [x] Search box (title, organization).
+- [x] Sort: deadline soonest (default) or newest added.
+- [x] View toggle: **Cards / List** (compact table: title, organization, type, status, deadline, location).
+- [x] All state in the URL (shareable); GET form works without JavaScript; "Clear filters"; empty state for no matches.
+- [x] Pagination (24 per page; ordering by a `status_rank` view column so pages are consistent; past-the-end pages show an empty page, not an error).
 - Location filter: skipped for now (free-text locations). Revisit with an AI-filled `country` column if needed.
 
 ### M5: Go Online

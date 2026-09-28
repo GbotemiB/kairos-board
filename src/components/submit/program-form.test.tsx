@@ -62,8 +62,9 @@ describe("ProgramForm", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Add to board" }));
 
-    const title = await screen.findByLabelText("Program name");
-    expect(screen.getByText("Add the program name.")).toHaveAttribute("id", "title-error");
+    // Wait for the action's result, not for a field that exists before it.
+    expect(await screen.findByText("Add the program name.")).toHaveAttribute("id", "title-error");
+    const title = screen.getByLabelText("Program name");
     expect(title).toHaveAttribute("aria-invalid", "true");
     expect(title).toHaveAttribute("aria-describedby", "title-error");
     expect(screen.getByLabelText("Organization")).toHaveValue("Kept Org");
