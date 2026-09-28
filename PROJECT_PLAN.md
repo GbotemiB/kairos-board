@@ -278,7 +278,7 @@ To maintain a high-quality open-source project, testing is built in from the sta
 - [x] Duplicate handling (link to existing program).
 - [x] Insert into Supabase via a Server Action (shared zod parser, unique-constraint message).
 - [x] "My submissions" (`/my`): edit (same form + validation) and delete (inline confirm), ownership filtered on id + submitter.
-- [ ] Playwright E2E for the full submission flow.
+- [x] Playwright E2E (3 tests: full flow, manual entry + validation, invalid link) against a production build + local Supabase, Gemini mocked via `GOOGLE_GEMINI_BASE_URL`. Added as a CI job.
 - [ ] **Demo:** sign up locally, paste a link, review, submit, see it on the board.
 
 ### M4: Board Polish

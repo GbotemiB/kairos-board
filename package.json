@@ -20,7 +20,8 @@
     "db:types": "mkdir -p src/lib/supabase && supabase gen types typescript --local > src/lib/supabase/database.types.ts",
     "db:types:check": "supabase gen types typescript --local | diff -u src/lib/supabase/database.types.ts - || (echo \"database.types.ts is stale. Run: npm run db:types\" && exit 1)",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build && npm run db:test && npm run db:types:check",
-    "extract": "tsx scripts/extract.ts"
+    "extract": "tsx scripts/extract.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
@@ -41,6 +42,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^7.0.1",
