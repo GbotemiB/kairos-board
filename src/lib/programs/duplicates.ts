@@ -4,6 +4,9 @@ import type { Database } from "@/lib/supabase/database.types";
 
 export type ExistingProgram = { id: string; title: string };
 
+/** Keeps a slow database from using up the extraction time budget. */
+export const DUPLICATE_CHECK_TIMEOUT_MS = 2_000;
+
 export type DuplicateCheckResult = { ok: true; existing: ExistingProgram | null } | { ok: false };
 
 /**
@@ -18,6 +21,8 @@ export async function findProgramByNormalizedUrl(
     .from("programs")
     .select("id, title")
     .eq("url_normalized", normalizedUrl)
+    // Also caps the client's automatic retries.
+    .abortSignal(AbortSignal.timeout(DUPLICATE_CHECK_TIMEOUT_MS))
     .maybeSingle();
 
   if (error !== null) {

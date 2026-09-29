@@ -1,11 +1,12 @@
 import type { NextRequest } from "next/server";
 import { z } from "zod";
 
-import { createDefaultGenerate, getGeminiModels } from "@/lib/ai/gemini";
+import { createDefaultGenerate, getGeminiModels, type GenerateJson } from "@/lib/ai/gemini";
 import { getCurrentUser } from "@/lib/auth/session";
 import { extractProgram } from "@/lib/extract/extract-program";
 import { checkRateLimit, recordExtraction } from "@/lib/extract/extraction-log";
 import { STATUS_BY_CODE, errorResponse, toApiResponse } from "@/lib/extract/http";
+import { isSameOrigin } from "@/lib/http/same-origin";
 import { findProgramByNormalizedUrl } from "@/lib/programs/duplicates";
 import { createServerSupabase } from "@/lib/supabase/server";
 
@@ -17,23 +18,17 @@ const bodySchema = z.object({
   text: z.string().max(100_000).optional(),
 });
 
-/**
- * Blocks cross-site requests. JSON-only bodies already force a CORS preflight;
- * checking Origin covers browsers and proxies that send it anyway.
- */
-function isSameOrigin(request: NextRequest): boolean {
-  const origin = request.headers.get("origin");
-  if (origin === null) {
-    return true;
-  }
+export async function POST(request: NextRequest): Promise<Response> {
   try {
-    return new URL(origin).host === request.nextUrl.host;
-  } catch {
-    return false;
+    return await handleExtract(request);
+  } catch (error) {
+    // Never answer with an HTML error page: the client expects JSON.
+    console.error("Unexpected error in /api/extract", error);
+    return errorResponse("UNAVAILABLE", "Something went wrong. Please try again shortly.");
   }
 }
 
-export async function POST(request: NextRequest): Promise<Response> {
+async function handleExtract(request: NextRequest): Promise<Response> {
   if (!isSameOrigin(request)) {
     return errorResponse("FORBIDDEN_ORIGIN", "Cross-site requests are not allowed.");
   }
@@ -71,11 +66,14 @@ export async function POST(request: NextRequest): Promise<Response> {
     );
   }
 
+  let generate: GenerateJson | undefined;
   const result = await extractProgram(
     { url: body.url, text: body.text },
     {
       findDuplicate: (normalized) => findProgramByNormalizedUrl(supabase, normalized),
-      generate: createDefaultGenerate(),
+      // Created only if the AI step is reached, so a missing key cannot break
+      // duplicate, blocked-link or thin-page responses.
+      generate: (generateRequest) => (generate ??= createDefaultGenerate())(generateRequest),
       models: getGeminiModels(),
     },
   );

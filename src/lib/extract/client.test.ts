@@ -37,15 +37,35 @@ describe("requestExtraction", () => {
     });
   });
 
-  it("turns a non-JSON response into an UNAVAILABLE response", async () => {
+  it.each([502, 504])("explains a hosting timeout page (HTTP %i)", async (status) => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => new Response("<html>502</html>", { status: 502 })),
+      vi.fn(
+        async () =>
+          new Response("<html>Task timed out</html>", {
+            status,
+            headers: { "content-type": "text/html" },
+          }),
+      ),
     );
 
-    expect(await requestExtraction({ url: "https://example.org" })).toMatchObject({
+    expect(await requestExtraction({ url: "https://example.org" })).toEqual({
       ok: false,
       code: "UNAVAILABLE",
+      message: "This took too long. Try again, or paste the page text instead.",
+    });
+  });
+
+  it("explains other non-JSON error pages", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => new Response("<html>500</html>", { status: 500 })),
+    );
+
+    expect(await requestExtraction({ url: "https://example.org" })).toEqual({
+      ok: false,
+      code: "UNAVAILABLE",
+      message: "Something went wrong on our side. Please try again shortly.",
     });
   });
 });

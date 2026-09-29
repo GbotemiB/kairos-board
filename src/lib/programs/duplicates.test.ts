@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { findProgramByNormalizedUrl } from "@/lib/programs/duplicates";
+import { DUPLICATE_CHECK_TIMEOUT_MS, findProgramByNormalizedUrl } from "@/lib/programs/duplicates";
 import type { Database } from "@/lib/supabase/database.types";
 
 type QueryResult = {
@@ -13,6 +13,7 @@ function fakeClient(result: QueryResult) {
   const builder = {
     select: vi.fn(() => builder),
     eq: vi.fn(() => builder),
+    abortSignal: vi.fn(() => builder),
     maybeSingle: vi.fn(() => Promise.resolve(result)),
   };
   const client = { from: vi.fn(() => builder) };
@@ -33,6 +34,17 @@ describe("findProgramByNormalizedUrl", () => {
     expect(builder.select).toHaveBeenCalledWith("id, title");
     expect(builder.eq).toHaveBeenCalledWith("url_normalized", "https://example.org/apply");
     expect(builder.maybeSingle).toHaveBeenCalledTimes(1);
+  });
+
+  it("times out the lookup so a slow database cannot use up the time budget", async () => {
+    const timeout = vi.spyOn(AbortSignal, "timeout");
+    const { client, builder } = fakeClient({ data: null, error: null });
+
+    await findProgramByNormalizedUrl(client, "https://example.org/apply");
+
+    expect(timeout).toHaveBeenCalledWith(DUPLICATE_CHECK_TIMEOUT_MS);
+    expect(builder.abortSignal).toHaveBeenCalledWith(expect.any(AbortSignal));
+    timeout.mockRestore();
   });
 
   it("returns the existing program when found", async () => {

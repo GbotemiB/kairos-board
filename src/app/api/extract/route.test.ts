@@ -21,8 +21,11 @@ vi.mock("@/lib/extract/extraction-log", () => ({
   checkRateLimit: mocks.checkRateLimit,
   recordExtraction: mocks.recordExtraction,
 }));
+const gemini = vi.hoisted(() => ({
+  createDefaultGenerate: vi.fn(() => vi.fn(async () => "{}")),
+}));
 vi.mock("@/lib/ai/gemini", () => ({
-  createDefaultGenerate: vi.fn(() => vi.fn()),
+  createDefaultGenerate: gemini.createDefaultGenerate,
   getGeminiModels: vi.fn(() => ["primary", "fallback"]),
 }));
 
@@ -189,6 +192,63 @@ describe("POST /api/extract", () => {
 
       expect(response.status).toBe(503);
       expect(mocks.extractProgram).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("robustness", () => {
+    it("accepts a same-site request behind a proxy (Netlify forwarded host)", async () => {
+      const request = new NextRequest("http://internal-host:3000/api/extract", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          origin: "https://kairos-board.netlify.app",
+          "x-forwarded-host": "kairos-board.netlify.app",
+        },
+        body: JSON.stringify({ url: "https://example.org" }),
+      });
+
+      expect((await POST(request)).status).toBe(200);
+    });
+
+    it("answers with JSON, not an HTML error page, when something unexpected throws", async () => {
+      vi.spyOn(console, "error").mockImplementation(() => {});
+      mocks.extractProgram.mockRejectedValue(new Error("boom"));
+
+      const response = await POST(post({ url: "https://example.org" }));
+
+      expect(response.status).toBe(503);
+      expect(response.headers.get("content-type")).toContain("application/json");
+      expect(await response.json()).toMatchObject({ ok: false, code: "UNAVAILABLE" });
+    });
+
+    it("creates the Gemini client only when the AI step runs", async () => {
+      // A missing GEMINI_API_KEY must not break responses that never reach the AI.
+      gemini.createDefaultGenerate.mockImplementation(() => {
+        throw new Error("Missing environment variable GEMINI_API_KEY");
+      });
+      mocks.extractProgram.mockResolvedValue(failure("THIN_CONTENT"));
+
+      const response = await POST(post({ url: "https://example.org/a" }));
+
+      expect(response.status).toBe(422);
+      expect(gemini.createDefaultGenerate).not.toHaveBeenCalled();
+    });
+
+    it("creates the Gemini client once, when the pipeline calls it", async () => {
+      const generate = vi.fn(async () => "{}");
+      gemini.createDefaultGenerate.mockImplementation(() => generate);
+      mocks.extractProgram.mockImplementation(
+        async (_input: unknown, deps: { generate: (request: unknown) => Promise<string> }) => {
+          await deps.generate({ model: "a" });
+          await deps.generate({ model: "b" });
+          return success();
+        },
+      );
+
+      await POST(post({ url: "https://example.org/a" }));
+
+      expect(gemini.createDefaultGenerate).toHaveBeenCalledTimes(1);
+      expect(generate).toHaveBeenCalledTimes(2);
     });
   });
 
