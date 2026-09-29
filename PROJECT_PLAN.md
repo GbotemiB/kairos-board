@@ -296,15 +296,18 @@ Decided 2026-09-28 after the M3.3 demo (build after M3 is finished):
 
 ### M5: Go Online
 
+- [x] Pre-flight: `/auth/confirm` also accepts the PKCE `?code=` that Supabase's default email template sends (verified with a real magic link via Mailpit); security headers (`X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy`) and no `X-Powered-By`.
+- Decided 2026-09-28: launch with email/password; GitHub/Google login moves to M6.
 - [ ] Push `feat/mvp`, open one PR. CI (including Playwright) and the Netlify deploy preview must pass.
 - [ ] Add `GEMINI_API_KEY` to Netlify (secret, not exposed to fork deploy previews).
-- [ ] Create GitHub and Google OAuth apps. Add Netlify production and preview URLs to the Supabase Auth redirect allow-list.
+- [ ] Supabase Auth: set Site URL and add Netlify production and deploy-preview URLs to the redirect allow-list.
 - [ ] Verify `/api/extract` fits Netlify's 10s function budget on the deploy preview.
 - [ ] Merge. Migrations deploy automatically. Smoke test production.
 
 ### M6: After Launch
 
 - [ ] "Report" button (the `reports` table already exists). Maintainers hide entries via `is_hidden`.
+- [ ] GitHub and Google login (OAuth apps, sign-in buttons, `/auth/callback`).
 - [ ] Comprehensive `README.md` (setup, tech stack, env vars) and `CONTRIBUTING.md` (tests, local Supabase, PR guidelines).
 - [ ] Theme toggle (dark mode).
 - [ ] Custom domain (optional).

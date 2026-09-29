@@ -2,9 +2,12 @@
 import { NextRequest } from "next/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const verifyOtp = vi.hoisted(() => vi.fn());
+const { verifyOtp, exchangeCodeForSession } = vi.hoisted(() => ({
+  verifyOtp: vi.fn(),
+  exchangeCodeForSession: vi.fn(),
+}));
 vi.mock("@/lib/supabase/server", () => ({
-  createServerSupabase: vi.fn(async () => ({ auth: { verifyOtp } })),
+  createServerSupabase: vi.fn(async () => ({ auth: { verifyOtp, exchangeCodeForSession } })),
 }));
 
 import { GET } from "@/app/auth/confirm/route";
@@ -16,6 +19,46 @@ function request(query: string) {
 describe("GET /auth/confirm", () => {
   beforeEach(() => {
     verifyOtp.mockReset();
+    exchangeCodeForSession.mockReset();
+  });
+
+  describe("PKCE code (Supabase's default email template)", () => {
+    it("exchanges the code for a session and redirects to the next path", async () => {
+      exchangeCodeForSession.mockResolvedValue({ error: null });
+
+      const response = await GET(request("code=abc-123&next=%2Fsubmit"));
+
+      expect(exchangeCodeForSession).toHaveBeenCalledWith("abc-123");
+      expect(verifyOtp).not.toHaveBeenCalled();
+      expect(response.headers.get("location")).toBe("http://localhost:3000/submit");
+    });
+
+    it("does not follow an unsafe next path", async () => {
+      exchangeCodeForSession.mockResolvedValue({ error: null });
+
+      const response = await GET(request("code=abc&next=https%3A%2F%2Fevil.com"));
+
+      expect(response.headers.get("location")).toBe("http://localhost:3000/");
+    });
+
+    it("sends the user to login with an error when the code is invalid or expired", async () => {
+      exchangeCodeForSession.mockResolvedValue({ error: { message: "invalid flow state" } });
+
+      const response = await GET(request("code=stale"));
+
+      expect(response.headers.get("location")).toBe(
+        "http://localhost:3000/login?error=confirmation",
+      );
+    });
+
+    it("ignores an empty code", async () => {
+      const response = await GET(request("code="));
+
+      expect(exchangeCodeForSession).not.toHaveBeenCalled();
+      expect(response.headers.get("location")).toBe(
+        "http://localhost:3000/login?error=confirmation",
+      );
+    });
   });
 
   it("verifies the token and redirects to the next path", async () => {
