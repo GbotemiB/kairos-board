@@ -20,6 +20,7 @@ const row: ProgramRow = {
   funding: "Stipend",
   status_override: null,
   status: "OPEN",
+  status_rank: 0,
 };
 
 describe("toProgram", () => {

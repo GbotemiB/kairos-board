@@ -1,7 +1,7 @@
 -- Derived status, constraints and triggers. Run with `npm run db:test`.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(15);
 
 -- ---------------------------------------------------------------------------
 -- Derived status in programs_public
@@ -45,6 +45,24 @@ select is(
   'CLOSED', 'status_override wins over derived status'
 );
 
+select results_eq(
+  $$select status::text, status_rank from public.programs_public
+    where url in ('https://status.test/open', 'https://status.test/upcoming', 'https://status.test/closed')
+    order by status_rank$$,
+  $$values ('OPEN', 0), ('UPCOMING', 1), ('CLOSED', 2)$$,
+  'status_rank orders open, then upcoming, then closed'
+);
+select is(
+  (select status_rank from public.programs_public where url = 'https://status.test/override'),
+  2,
+  'status_rank follows the override'
+);
+select is(
+  (select count(*)::int from public.programs_public where status_rank is null),
+  0,
+  'every visible program has a status_rank'
+);
+
 -- ---------------------------------------------------------------------------
 -- Constraints
 -- ---------------------------------------------------------------------------
@@ -81,6 +99,23 @@ select is(
   (select updated_at from public.programs where url = 'https://status.test/trigger'),
   now(),
   'updated_at is refreshed on update'
+);
+
+-- ---------------------------------------------------------------------------
+-- extraction_logs outcome values
+-- ---------------------------------------------------------------------------
+insert into auth.users (id, email) values ('cccccccc-0000-0000-0000-000000000003', 'logs@test.local');
+
+select lives_ok(
+  $$insert into public.extraction_logs (user_id, url_normalized, outcome)
+    values ('cccccccc-0000-0000-0000-000000000003', 'https://status.test/busy', 'AI_BUSY')$$,
+  'AI_BUSY is an accepted extraction outcome'
+);
+select throws_ok(
+  $$insert into public.extraction_logs (user_id, url_normalized, outcome)
+    values ('cccccccc-0000-0000-0000-000000000003', 'https://status.test/bogus', 'BOGUS')$$,
+  '23514', null,
+  'unknown extraction outcomes are rejected'
 );
 
 select * from finish();

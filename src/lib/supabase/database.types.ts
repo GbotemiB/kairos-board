@@ -176,49 +176,12 @@ export type Database = {
           organization: string | null
           status: Database["public"]["Enums"]["program_status"] | null
           status_override: Database["public"]["Enums"]["program_status"] | null
+          status_rank: number | null
           submitter_id: string | null
           title: string | null
           type: Database["public"]["Enums"]["program_type"] | null
           updated_at: string | null
           url: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          deadline?: string | null
-          deadline_type?: Database["public"]["Enums"]["deadline_type"] | null
-          eligibility?: string[] | null
-          field?: string | null
-          funding?: string | null
-          id?: string | null
-          location?: string | null
-          opens_at?: string | null
-          organization?: string | null
-          status?: never
-          status_override?: Database["public"]["Enums"]["program_status"] | null
-          submitter_id?: string | null
-          title?: string | null
-          type?: Database["public"]["Enums"]["program_type"] | null
-          updated_at?: string | null
-          url?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          deadline?: string | null
-          deadline_type?: Database["public"]["Enums"]["deadline_type"] | null
-          eligibility?: string[] | null
-          field?: string | null
-          funding?: string | null
-          id?: string | null
-          location?: string | null
-          opens_at?: string | null
-          organization?: string | null
-          status?: never
-          status_override?: Database["public"]["Enums"]["program_status"] | null
-          submitter_id?: string | null
-          title?: string | null
-          type?: Database["public"]["Enums"]["program_type"] | null
-          updated_at?: string | null
-          url?: string | null
         }
         Relationships: []
       }

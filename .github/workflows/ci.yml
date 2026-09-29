@@ -49,9 +49,33 @@ jobs:
           -x gotrue,realtime,storage-api,imgproxy,kong,mailpit,postgrest,studio,edge-runtime,logflare,vector,supavisor
       - run: npm run db:test
       - name: Check generated types are up to date
+        run: npm run db:types:check
+
+  e2e:
+    name: End-to-end tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Database, auth, REST gateway. Gemini is mocked (e2e/mock-gemini.mjs).
+      - name: Start local Supabase
+        run: >-
+          npx supabase start
+          -x realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+      - name: Point the app at local Supabase
         run: |
-          npx supabase gen types typescript --local > "$RUNNER_TEMP/database.types.ts"
-          if ! diff -u src/lib/supabase/database.types.ts "$RUNNER_TEMP/database.types.ts"; then
-            echo "::error::database.types.ts is stale. Run 'npm run db:types' and commit the result."
-            exit 1
-          fi
+          eval "$(npx supabase status -o env | grep -E '^(API_URL|PUBLISHABLE_KEY)=')"
+          echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

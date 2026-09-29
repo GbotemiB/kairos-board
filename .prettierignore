@@ -6,3 +6,6 @@ next-env.d.ts
 supabase/.temp
 AGENTS.md
 src/lib/supabase/database.types.ts
+playwright-report
+test-results
+blob-report
